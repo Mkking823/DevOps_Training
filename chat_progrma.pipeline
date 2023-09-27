@@ -1,0 +1,47 @@
+pipeline{
+    
+    agent any
+    
+    environment {
+        DOCKERHUB_CREDENTIALS=credentials('dockerhub_id')
+    }
+    
+    stages {
+        stage('gitclone') {
+            
+            steps {
+            
+                git branch: 'main', url: 'https://github.com/Mkking823/DevOps_Training.git'
+            }
+        }
+        
+        stage('Build') {
+            
+            steps {
+                sh 'pwd;ls;cd ..;pwd;ls'
+                sh 'docker build -t mkking123/python_code:latest .'
+                
+            }
+        }
+        stage('Login') {
+            
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
+
+        stage('Push') {
+            
+            steps {
+                sh 'docker push mkking123/python_code:latest'
+            }
+        }
+    }
+    
+    post {
+        always {
+            sh 'docker logout'
+        }
+    }
+    
+}
