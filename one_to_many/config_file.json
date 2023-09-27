@@ -1,0 +1,13 @@
+{
+    "max_buffer_size": 1024,
+    "servers": [
+        {
+            "ip":"localhost",
+            "port": 3333
+        },
+        {
+            "ip":"localhost",
+            "port": 8888
+        }
+    ]
+}
