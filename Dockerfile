@@ -8,4 +8,4 @@ WORKDIR /app
 COPY . /app
 
 # Run main.py when the container launches
-CMD ["python", "asssending_order.py"]
+CMD ["python", "ass_des_order.py"]
