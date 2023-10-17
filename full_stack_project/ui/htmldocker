@@ -1,0 +1,23 @@
+# Use an official Python runtime as a parent image
+FROM python:3.8-slim
+
+# Install Flask and Flask-CORS
+RUN pip install flask flask_cors
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Define environment variables
+ENV FLASK_APP=html_ui.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=5002
+
+# Copy your Flask application code and templates into the container
+COPY html_ui.py /app
+COPY templates/index.html /app/templates/index.html
+
+# Expose the port your Flask app will run on
+EXPOSE 5002
+
+# Run your Flask application
+CMD ["flask", "run"]
