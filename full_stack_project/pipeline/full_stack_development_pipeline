@@ -1,0 +1,78 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+        SSH_CREDENTIALS = credentials('ssh_credentials') // Replace with your SSH credentials ID
+    }
+    
+    stages {
+        stage('Git Clone') {
+            steps {
+                git branch: 'master', url: 'https://github.com/vprkrish/cloudops.git'
+            }
+        }
+        stage('Create and Activate Virtual Environment') {
+            steps {
+                script {
+                    sh 'python3 -m venv venv'
+                    sh '. venv/bin/activate' // Activate the virtual environment using dot (.)
+                }
+            }
+        }
+        stage('Build unit_test') {
+            steps {
+                sh 'pwd;ls;cd tests;pwd;ls'
+                sh 'pip install -r tests/requirements.txt'
+            }
+        }
+        stage('Run Unit Tests') {
+            steps {
+                sh 'pwd;ls'
+                sh 'python3 "tests/unit_testing.py"'
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker-compose up --build'
+            }
+        }
+        stage('Login') {
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
+        stage('Push') {
+            
+            steps {
+                sh 'docker tag mysql:5.7 sainadh01/mysql:5.7'
+                sh 'docker push sainadh01/mysql:5.7'
+                sh 'docker tag full_stack_development_pipeline_app sainadh01/full_stack_development_pipeline_app'
+                sh 'docker push sainadh01/full_stack_development_pipeline_app'
+                sh 'docker tag full_stack_development_pipeline_app1 sainadh01/full_stack_development_pipeline_app1'
+                sh 'docker push sainadh01/full_stack_development_pipeline_app1'
+                sh 'docker tag full_stack_development_pipeline_app2 sainadh01/full_stack_development_pipeline_app2'
+                sh 'docker push sainadh01/full_stack_development_pipeline_app2'
+            }
+        }
+            stage('Pull Docker Image on EC2') {
+                steps {
+                    script {    
+                        withCredentials([sshUserPrivateKey(credentialsId: 'ssh_credentials', keyFileVariable: 'SSH_PRIVATE_KEY', passphraseVariable: '', usernameVariable: 'SSH_USERNAME')]) {
+                            sh """
+                                chmod 400 $SSH_PRIVATE_KEY
+                                ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@3.26.8.119 << EOF
+                                sudo docker login -u sainadh01 -p Sai@Nadh123
+                                sudo docker pull sainadh01/mysql:5.7
+                                sudo docker pull sainadh01/full_stack_development_pipeline_app
+                                sudo docker pull sainadh01/full_stack_development_pipeline_app1
+                                sudo docker pull sainadh01/full_stack_development_pipeline_app2
+                                docker-compose up --build
+                                """
+                    }
+                }
+            }
+        }
+    }
+}
