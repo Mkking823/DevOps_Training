@@ -1,8 +1,8 @@
 version: "3"
 services:
   app:
-    image: sainadh01/full_stack_development_pipeline_app
-    container_name: "DBRestapi"
+    image: mkking123/full_stack_development_pipeline_app
+    container_name: "DB_restapi"
     ports:
       - "5000:5000"
     links:
