@@ -11,7 +11,7 @@ services:
       - custom-network
 
   app1:
-    image: sainadh01/full_stack_development_pipeline_app1
+    image: mkking123/full_stack_development_pipeline_app1
     container_name: "rest_api"
     ports:
       - "5001:5001"
@@ -19,7 +19,7 @@ services:
       - custom-network
 
   app2:
-    image: sainadh01/full_stack_development_pipeline_app2
+    image: mkking123/full_stack_development_pipeline_app2
     container_name: "html-container"
     ports:
       - "5002:5002"
