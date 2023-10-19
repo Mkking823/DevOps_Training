@@ -1,0 +1,39 @@
+version: "3"
+services:
+  app:
+    image: sainadh01/full_stack_development_pipeline_app
+    container_name: "DBRestapi"
+    ports:
+      - "5000:5000"
+    links:
+      - db
+    networks:
+      - custom-network
+
+  app1:
+    image: sainadh01/full_stack_development_pipeline_app1
+    container_name: "rest_api"
+    ports:
+      - "5001:5001"
+    networks:
+      - custom-network
+
+  app2:
+    image: sainadh01/full_stack_development_pipeline_app2
+    container_name: "html-container"
+    ports:
+      - "5002:5002"
+    networks:
+      - custom-network
+  db:
+    image: mysql:5.7
+    container_name: "db_container"
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: deeksha
+    networks:
+      - custom-network
+
+networks:
+  custom-network:
