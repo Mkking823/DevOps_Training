@@ -1,0 +1,10 @@
+---
+- name: Print Message on Ubuntu VM
+  hosts: localhost
+  remote_user: ubuntu
+  become: yes
+
+  tasks:
+    - name: Print Message
+      debug:
+        msg: "Hello, this message is printed from Ansible on the Ubuntu VM!"
