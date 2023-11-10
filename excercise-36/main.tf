@@ -1,3 +1,4 @@
+#terraform
 provider "aws" {
   region = "eu-north-1" # Change this to your desired AWS region
   access_key="AKIA367S7HZ5YGLBFNC2"
