@@ -1,7 +1,7 @@
 {
     "DATABASE_CONFIG": {
         "user": "root",
-        "password": "deeksha",
+        "password": "mahesh",
         "host": "db",
         "port": "3306",
         "database": "employee"
