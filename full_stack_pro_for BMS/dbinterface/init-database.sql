@@ -1,0 +1,9 @@
+
+CREATE DATABASE IF NOT EXISTS books;
+USE books;
+
+CREATE TABLE IF NOT EXISTS Books ( id INT AUTO_INCREMENT PRIMARY KEY, 
+title VARCHAR(255), 
+author VARCHAR(255), 
+year int 
+);
