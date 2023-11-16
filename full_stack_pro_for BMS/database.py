@@ -1,6 +1,6 @@
 import mysql.connector
 import json
-
+#here is database
 def load_config():
     with open('config.json', 'r') as config_file:
         config_data = json.load(config_file)
