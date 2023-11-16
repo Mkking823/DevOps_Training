@@ -1,7 +1,7 @@
 # Use an official Python runtime as a parent image
 FROM python:3.8-slim
 
-# Install necessary packages
+# Install necessary package
 RUN pip install flask_cors
 RUN pip install requests
 ENV FLASK_APP restapi.py
