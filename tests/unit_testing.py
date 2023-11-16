@@ -4,7 +4,7 @@ from database import get_books, add_book, get_book, update_book, delete_book
 from unittest.mock import patch
 
 class TestBookFunctions(unittest.TestCase):
-    @patch('your_module_name.open', create=True)
+    @patch('database.open', create=True)
     def test_get_books(self, mock_open):
         # Mock the file content to return the desired configuration
         mock_open.return_value.__enter__.return_value.read.return_value = '{"DATABASE_CONFIG": {"user": "test_user", "password": "test_password", "host": "localhost", "database": "test_database"}}'
