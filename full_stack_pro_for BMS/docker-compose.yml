@@ -1,0 +1,46 @@
+version: "3"
+services:
+  app:
+    build:
+      context: ./dbinterface
+      dockerfile: db-dockerfile
+    container_name: "DBRestapi"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    networks:
+      - custom-network
+
+  app1:
+    build:
+      context: ./services
+      dockerfile: api-dockerfile
+    container_name: "rest_api"
+    ports:
+      - "5001:5001"
+    networks:
+      - custom-network
+  
+  app2:
+    build:
+      context: ./ui
+      dockerfile: htmldocker
+    container_name: "html-container"
+    ports:
+      - "5002:5002"
+    networks:
+      - custom-network
+      
+  db:
+    image: mysql:5.7
+    container_name: "db_container"
+    ports:
+      - "32000:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mahesh
+    networks:
+      - custom-network
+
+networks:
+  custom-network:
