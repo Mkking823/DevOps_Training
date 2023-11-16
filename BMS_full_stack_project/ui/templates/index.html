@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Books Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #000000;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #ff0000;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #CCC;
+            border-radius: 5px;
+            background-color: #fff;
+            text-align: left;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #FF0000;
+            color: white;
+        }
+
+        .crud-form {
+            display: none;
+            text-align: left;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .crud-form label {
+            display: block;
+            margin-top: 10px;
+            color: #ffffff;
+        }
+
+        .crud-form input[type="text"],
+        .crud-form input[type="date"] {
+            width: 100%;
+            padding: 5px;
+        }
+
+        .crud-form button[type="button"] {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Books Management System</h1>
+    <div>
+        <!-- Buttons to trigger CRUD operations -->
+        <button id="createButton">Create</button>
+        <button id="fetchButton">Fetch</button>
+        <button id="updateButton">Update</button>
+        <button id="deleteButton">Delete</button>
+        <button id="readButton">List</button>
+    </div>
+    <div id="response"></div>
+
+    <!-- Create Book Form -->
+    <div class="crud-form" id="createBookForm">
+        <h2>Create Book</h2>
+        <form onsubmit="createBook(); return false;">
+            <label for="createTitle">Title:</label>
+            <input type="text" id="createTitle" name="createTitle" required><br>
+
+            <label for="createAuthor">Author:</label>
+            <input type="text" id="createAuthor" name="createAuthor" required><br>
+
+            <label for="createYear">Year:</label>
+            <input type="text" id="createYear" name="createYear" required><br>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <!-- Fetch Book Form -->
+    <div class="crud-form" id="fetchBookForm">
+        <h2>Fetch Book Details by ID</h2>
+        <form onsubmit="fetchBook(); return false;">
+            <label for="fetchBookId">Book ID:</label>
+            <input type="text" id="fetchBookId" name="fetchBookId" required><br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <!-- Update Book Form -->
+    <div class="crud-form" id="updateBookForm">
+        <h2>Update Book</h2>
+        <form onsubmit="fetchBookForUpdate(); return false;">
+            <label for="updateBookId">Book ID to Update:</label>
+            <input type="text" id="updateBookId" name="updateBookId" required><br>
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- Update Book Details Form -->
+        <div class="crud-form" id="updateBookDetailsForm">
+            <h2>Update Book Details</h2>
+            <form onsubmit="updateBook(); return false;">
+                <label for="updateTitle">Updated Title:</label>
+                <input type="text" id="updateTitle" name="updateTitle" required><br>
+
+                <label for="updateAuthor">Updated Author:</label>
+                <input type="text" id="updateAuthor" name="updateAuthor" required><br>
+
+                <label for="updateYear">Updated Year:</label>
+                <input type="text" id="updateYear" name="updateYear" required><br>
+
+                <button type="submit">Update Book</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Book Form -->
+    <div class="crud-form" id="deleteBookForm">
+        <h2>Delete Book</h2>
+        <form onsubmit="deleteBook(); return false;">
+            <label for="deleteBookId">Book ID to Delete:</label>
+            <input type="text" id="deleteBookId" name="deleteBookId" required><br>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <!-- Read Books Form -->
+    <div class="crud-form" id="readBooksForm">
+        <!-- Table to display book data -->
+        <table id="bookTable"></table>
+    </div>
+
+    <script>
+        // base URL for the API
+        const baseUrl = 'http://0.0.0.0:5001/booksinfo';
+
+        // Add event listeners for the buttons
+        document.getElementById('createButton').addEventListener('click', showCreateBookForm);
+        document.getElementById('fetchButton').addEventListener('click', showFetchBookForm);
+        document.getElementById('updateButton').addEventListener('click', showUpdateBookForm);
+        document.getElementById('deleteButton').addEventListener('click', showDeleteBookForm);
+        document.getElementById('readButton').addEventListener('click', showReadBooksForm);
+
+        function displayResponse(responseText) {
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = '';
+
+            if (Array.isArray(responseText)) {
+                if (responseText.length === 0) {
+                    responseDiv.innerHTML = 'No books found.';
+                    return;
+                }
+
+                // Create a table to display the book data
+                const table = document.createElement('table');
+                table.innerHTML = `
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Year</th>
+                    </tr>
+                `;
+
+                // table with book data
+                responseText.forEach((book) => {
+                    const row = table.insertRow();
+                    row.innerHTML = `
+                        <td>${book.id}</td>
+                        <td>${book.title}</td>
+                        <td>${book.author}</td>
+                        <td>${book.year}</td>
+                    `;
+                });
+
+                responseDiv.appendChild(table);
+            } else {
+                responseDiv.innerHTML = JSON.stringify(responseText, null, 2);
+            }
+        }
+
+        function showCreateBookForm() {
+            hideAllForms();
+            document.getElementById('createBookForm').style.display = 'block';
+        }
+
+        function showFetchBookForm() {
+            hideAllForms();
+            document.getElementById('fetchBookForm').style.display = 'block';
+        }
+
+        function showUpdateBookForm() {
+            hideAllForms();
+            document.getElementById('updateBookForm').style.display = 'block';
+        }
+
+        function showDeleteBookForm() {
+            hideAllForms();
+            document.getElementById('deleteBookForm').style.display = 'block';
+        }
+
+        function showReadBooksForm() {
+            hideAllForms();
+            document.getElementById('readBooksForm').style.display = 'block';
+
+            // Fetch and display the list of books
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', baseUrl, true);
+            xhr.setRequestHeader('Accept', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        displayResponse(response);
+                    } else {
+                        console.log(xhr.statusText);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        function hideAllForms() {
+            const forms = document.getElementsByClassName('crud-form');
+            for (let i = 0; i < forms.length; i++) {
+                forms[i].style.display = 'none';
+            }
+        }
+
+        // Function to create a new book
+        function createBook() {
+            const xhr = new XMLHttpRequest();
+            const url = baseUrl;
+
+            const title = document.getElementById('createTitle').value;
+            const author = document.getElementById('createAuthor').value;
+            const year = document.getElementById('createYear').value;
+
+            if (!title || !author || !year) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            const data = {
+                title: title,
+                author: author,
+                year: year
+            };
+
+            xhr.open('POST', url);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(data));
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    displayResponse('Book created successfully');
+
+                    document.getElementById('createTitle').value = '';
+                    document.getElementById('createAuthor').value = '';
+                    document.getElementById('createYear').value = '';
+                    document.getElementById('createBookForm').style.display = 'none';
+                } else {
+                    console.log(xhr.statusText);
+                }
+            };
+        }
+
+        // Function to fetch book details for update
+        function fetchBookForUpdate() {
+            const id = document.getElementById('updateBookId').value;
+            const url = `${baseUrl}/${id}`;
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.setRequestHeader('Accept', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        document.getElementById('updateBookId').disabled = true;
+                        document.getElementById('updateTitle').value = response.title;
+                        document.getElementById('updateAuthor').value = response.author;
+                        document.getElementById('updateYear').value = response.year;
+                        document.getElementById('updateBookDetailsForm').style.display = 'block';
+                    } else if (xhr.status === 404) {
+                        displayResponse('Book not found.');
+                    } else {
+                        console.log(xhr.statusText);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        // Function to update book details
+        function updateBook() {
+            const id = document.getElementById('updateBookId').value;
+            const url = `${baseUrl}/${id}`;
+
+            const title = document.getElementById('updateTitle').value;
+            const author = document.getElementById('updateAuthor').value;
+            const year = document.getElementById('updateYear').value;
+
+            if (!title || !author || !year) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            const data = {
+                title: title,
+                author: author,
+                year: year
+            };
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('PUT', url);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(data));
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    displayResponse('Book details updated successfully');
+                    document.getElementById('updateBookId').disabled = false;
+                    document.getElementById('updateBookId').value = '';
+                    document.getElementById('updateTitle').value = '';
+                    document.getElementById('updateAuthor').value = '';
+                    document.getElementById('updateYear').value = '';
+
+                    document.getElementById('updateBookForm').style.display = 'none';
+                } else {
+                    console.log(xhr.statusText);
+                }
+            };
+        }
+
+        // Function to delete a book
+        function deleteBook() {
+            const xhr = new XMLHttpRequest();
+            const id = document.getElementById('deleteBookId').value;
+            const url = `${baseUrl}/${id}`;
+
+            xhr.open('DELETE', url);
+            xhr.send();
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    displayResponse('Book deleted successfully.');
+                    document.getElementById('deleteBookId').value = '';
+                    hideAllForms();
+                } else {
+                    console.log(xhr.statusText);
+                }
+            };
+        }
+
+        // Function to fetch book details by ID
+        function fetchBook() {
+            const xhr = new XMLHttpRequest();
+            const id = document.getElementById('fetchBookId').value;
+            const url = `${baseUrl}/${id}`;
+
+            xhr.open('GET', url, true);
+            xhr.setRequestHeader('Accept', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        displayResponse([response]);
+                        hideFetchBookForm();
+                    } else if (xhr.status === 404) {
+                        displayResponse('Book not found.');
+                        hideFetchBookForm();
+                    } else {
+                        console.log(xhr.statusText);
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        // Function to hide the fetch book form
+        function hideFetchBookForm() {
+            document.getElementById('fetchBookForm').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>
