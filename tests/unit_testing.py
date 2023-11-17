@@ -3,26 +3,26 @@ from unittest.mock import MagicMock, patch
 from database import get_books, add_book, get_book, update_book, delete_book
 from unittest.mock import patch
 
-class TestBookFunctions(unittest.TestCase):
-    @patch('database.open', create=True)
-    def test_get_books(self, mock_open):
-        # Mock the file content to return the desired configuration
-        mock_open.return_value.__enter__.return_value.read.return_value = '{"DATABASE_CONFIG": {"user": "test_user", "password": "test_password", "host": "localhost", "database": "test_database"}}'
-
-        # Rest of your test code
-        result = get_books()
-        # Assertions
-
 # class TestBookFunctions(unittest.TestCase):
-#     @patch('database.mysql.connector.connect')
-#     def test_get_books(self, mock_connect):
-#         # Mock the database connection and cursor
-#         mock_cursor = MagicMock()
-#         mock_cursor.fetchall.return_value = [{'id': 1, 'title': 'Book 1', 'author': 'Author 1', 'year': 2022}]
-#         mock_connect.return_value.cursor.return_value = mock_cursor
+#     @patch('database.open', create=True)
+#     def test_get_books(self, mock_open):
+#         # Mock the file content to return the desired configuration
+#         mock_open.return_value.__enter__.return_value.read.return_value = '{"DATABASE_CONFIG": {"user": "test_user", "password": "test_password", "host": "localhost", "database": "test_database"}}'
 
-#         # Call the function to be tested
+#         # Rest of your test code
 #         result = get_books()
+#         # Assertions
+
+class TestBookFunctions(unittest.TestCase):
+    @patch('database.mysql.connector.connect')
+    def test_get_books(self, mock_connect):
+        # Mock the database connection and cursor
+        mock_cursor = MagicMock()
+        mock_cursor.fetchall.return_value = [{'id': 1, 'title': 'Book 1', 'author': 'Author 1', 'year': 2022}]
+        mock_connect.return_value.cursor.return_value = mock_cursor
+
+        # Call the function to be tested
+        result = get_books()
 
         # Assertions
         self.assertEqual(len(result), 1)
