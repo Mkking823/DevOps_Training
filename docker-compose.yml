@@ -4,7 +4,7 @@ services:
     build:
       context: ./dbinterface
       dockerfile: db-dockerfile
-    container_name: "DBRestapi"
+    container_name: "DB_Restapi"
     ports:
       - "5000:5000"
     depends_on:
@@ -16,7 +16,7 @@ services:
     build:
       context: ./services
       dockerfile: api-dockerfile
-    container_name: "rest_api"
+    container_name: "restapi"
     ports:
       - "5001:5001"
     networks:
@@ -34,7 +34,7 @@ services:
       
   db:
     image: mysql:5.7
-    container_name: "db_container"
+    container_name: "db-container"
     ports:
       - "32000:3306"
     environment:
