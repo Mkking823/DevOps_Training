@@ -26,7 +26,7 @@ services:
     build:
       context: ./ui
       dockerfile: htmldocker
-    container_name: "html-container"
+    container_name: "html_container"
     ports:
       - "5002:5002"
     networks:
