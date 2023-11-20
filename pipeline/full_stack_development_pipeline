@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub_id')
+        SSH_CREDENTIALS = credentials('ssh_credentials')
+    }
+    
+    stages {
+        stage('Git Clone') {
+            steps {
+                git branch: 'books_management_system', url: 'https://github.com/Mkking823/DevOps_Training.git'
+            }
+        }
+        
+        stage('Create and Activate Virtual Environment') {
+            steps {
+                sh 'python3 -m venv venv'
+                sh '. venv/bin/activate'
+            }
+        }
+        
+        // stage('Build Docker Image') {
+        //     steps {
+        //         dir("/var/lib/jenkins/workspace/full_stack_project1") {
+        //             sh "docker-compose -f docker-compose.yml up --build"
+        //         }
+        //     }
+        // }
+
+        stage('Login') {
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin registry-1.docker.io'
+            }
+        }
+
+        stage('Push') {
+            steps {
+                sh 'docker login -u mkking123 -p mahesh123'
+                sh 'docker tag mysql:5.7 mkking123/mysql:5.7 && docker push mkking123/mysql:5.7'
+                sh 'docker tag full_stack_project1_app mkking123/full_stack_project1_app && docker push mkking123/full_stack_project1_app'
+                sh 'docker tag full_stack_project1_app1 mkking123/full_stack_project1_app1 && docker push mkking123/full_stack_project1_app1'
+                sh 'docker tag full_stack_project1_app2 mkking123/full_stack_project1_app2 && docker push mkking123/full_stack_project1_app2'
+            }
+        }
+
+        stage('Pull Docker Image on EC2') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh_credentials', keyFileVariable: 'SSH_PRIVATE_KEY', passphraseVariable: '', usernameVariable: 'SSH_USERNAME')]) {
+                    sh """
+                        chmod 400 $SSH_PRIVATE_KEY
+                        ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@16.171.231.104 << EOF
+                        sudo docker login -u mkking123 -p mahesh123
+                        sudo docker pull mkking123/mysql:5.7
+                        sudo docker pull mkking123/full_stack_project1_app
+                        sudo docker pull mkking123/full_stack_project1_app1
+                        sudo docker pull mkking123/full_stack_project1_app2
+                        docker-compose up 
+                        EOF
+                    """
+                }
+            }
+        }
+    }
+}
