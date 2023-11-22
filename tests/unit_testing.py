@@ -47,8 +47,33 @@ class TestBookFunctions(unittest.TestCase):
         self.assertEqual(result['title'], 'Book 1')
         self.assertEqual(result['author'], 'Author 1')
         self.assertEqual(result['year'], 2022)
+        
+    @patch('database.mysql.connector.connect')
+    def test_update_book(self, mock_connect):
+        # Mock the database connection and cursor
+        mock_cursor = MagicMock()
+        mock_connect.return_value.cursor.return_value = mock_cursor
 
-    # Similarly, you can write tests for update_book and delete_book functions
+        # Call the function to be tested
+        update_book(1, 'Updated Title', 'Updated Author', 2023)
+
+        # Assertions
+        mock_cursor.execute.assert_called_once_with(
+            'UPDATE Books SET title=%s, author=%s, year=%s WHERE id=%s',
+            ('Updated Title', 'Updated Author', 2023, 1)
+        )
+
+    @patch('database.mysql.connector.connect')
+    def test_delete_book(self, mock_connect):
+        # Mock the database connection and cursor
+        mock_cursor = MagicMock()
+        mock_connect.return_value.cursor.return_value = mock_cursor
+
+        # Call the function to be tested
+        delete_book(1)
+
+        # Assertions
+        mock_cursor.execute.assert_called_once_with('DELETE FROM Books WHERE id=%s', (1,))
 
 if __name__ == '__main__':
     unittest.main()
