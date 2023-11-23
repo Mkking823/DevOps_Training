@@ -4,11 +4,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
+# Rest of your code ...
+
 # Function to wait for an element to be clickable
 def wait_for_element_to_be_clickable(by, value, timeout=10):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable((by, value)))
 
-# Create a new instance of the chrome drive
+# Create a new instance of the Firefox driver
+#driver = webdriver.Firefox()
 driver = webdriver.Chrome()
 driver.maximize_window()
 
@@ -16,8 +19,8 @@ driver.maximize_window()
 driver.get("http://127.0.0.1:5002")
 
 # Function to wait for an element to be clickable
-def wait_for_element_to_be_clickable(by, value, timeout=100):
-    return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable((by, value)))
+#def wait_for_element_to_be_clickable(by, value, timeout=100):
+ #   return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable((by, value)))
 
 # --- Create Operation ---
 def create_book(title, author, year):
@@ -90,16 +93,16 @@ def delete_book(book_id):
 # --- Example Usage ---
 try:
     # Create a book
-    create_book("The Great Gatsby", "F. Scott Fitzgerald", "1925")
+    create_book("The Book of Secrets", "osho", "1973")
 
     # Fetch and display the details of the created book
-    fetch_book("10")
+    fetch_book("4")
 
     # Update the book details
-    update_book("11", "The Great Gatsby (Updated)", "F. Scott Fitzgerald", "1925")
+    update_book("4", "The Book of Secrets(Updated)", "osho", "1925")
 
     # Delete the book
-    delete_book("9")
+    delete_book("3")
 
 finally:
     # Close the browser window
