@@ -8,8 +8,7 @@ import time
 def wait_for_element_to_be_clickable(by, value, timeout=10):
     return WebDriverWait(driver, timeout).until(EC.element_to_be_clickable((by, value)))
 
-# Create a new instance of the Firefox driver
-#driver = webdriver.Firefox()
+# Create a new instance of the chrome drive
 driver = webdriver.Chrome()
 driver.maximize_window()
 
