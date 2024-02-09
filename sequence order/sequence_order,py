@@ -1,0 +1,55 @@
+def is_prime(n):
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+
+
+def identify_sequence(sequence):
+    if all(isinstance(item, int) for item in sequence):
+        diff = sequence[1] - sequence[0]
+        if all(sequence[i] + diff == sequence[i + 1] for i in range(len(sequence) - 1)):
+            return sequence[-1] + diff
+        elif all(is_prime(num) for num in sequence):
+            next_odd = sequence[-1] + 2
+            while not is_prime(next_odd):
+                next_odd += 2
+            return next_odd
+    elif all(isinstance(item, str) and item[:-1].isalpha() and item[-1].isdigit() for item in sequence):
+        base_str = sequence[0][:-1]
+        last_num = int(sequence[-1][-1])
+        return base_str + str(last_num + 1)
+    return None
+
+
+def main():
+    while True:
+        sequence_str = input("Enter the sequence separated by commas, or type 'exit' to quit: ")
+        if sequence_str.lower() == 'exit':
+            print("Exiting...")
+            break
+
+        sequence = sequence_str.split(",")
+        sequence = [s.strip() for s in sequence]
+
+        for i in range(len(sequence)):
+            if sequence[i].isdigit():
+                sequence[i] = int(sequence[i])
+
+        next_item = identify_sequence(sequence)
+        if next_item is not None:
+            print(f"The next item in the sequence {sequence} is {next_item}")
+        else:
+            print(f"The sequence {sequence} does not follow a recognized pattern")
+
+
+if __name__ == "__main__":
+    main()
